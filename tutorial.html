@@ -12,6 +12,32 @@
       /**
        * @jsx React.DOM
        */
+      var Result = React.createClass({
+        render: function() {
+          return (
+            <tr>
+              <td>{this.props.data.rank}</td>
+              <td>{this.props.data.bibNumber}</td>
+              <td>{this.props.data.name}</td>
+              <td>{this.props.data.time}</td>
+            </tr>
+          );
+        }
+      });
+
+      var ResultList = React.createClass({
+        render: function() {
+          var resultNodes = this.props.data.map(function(result) {
+            return <Result data={result} />;
+          });
+          return (
+            <tbody>
+              {resultNodes}
+            </tbody>
+          );
+        }
+      });
+
       var TeamResults = React.createClass({
         getInitialState: function () {
           return {
@@ -31,7 +57,7 @@
             error: function(xhr, status, err) {
               console.log('Error loading results.json', arguments);
             }.bind(this)
-          })
+          });
         },
 
         render: function() {
@@ -45,41 +71,15 @@
                   <th>Time</th>
                 </tr>
               </thead>
-              <tbody>
-                <ResultList data={this.state.data} />
-              </tbody>
+              <ResultList data={this.state.data} />
             </table>
             
           );
         }
       });
 
-      var ResultList = React.createClass({
-        render: function() {
-          var resultNodes = this.props.data.map(function(result) {
-            return <Result data={result} />;
-          });
-          return (
-            {resultNodes}
-          );
-        }
-      });
-
-      var Result = React.createClass({
-        render: function() {
-          return (
-            <tr>
-              <td>{this.props.data.rank}</td>
-              <td>{this.props.data.bibNumber}</td>
-              <td>{this.props.data.name}</td>
-              <td>{this.props.data.time}</td>
-            </tr>
-          );
-        }
-      });
-
       React.renderComponent(
-        TeamResults({}),
+        <TeamResults />,
         document.getElementById('content')
       );
     </script>

@@ -1,0 +1,26 @@
+[
+	{
+		"name": "Phil",
+		"rank": 1,
+		"bib": 1,
+		"time": "12:43"
+	},
+	{
+		"name": "George",
+		"rank": 3,
+		"bib": 2,
+		"time": "12:12"
+	},
+	{
+		"name": "Jim",
+		"rank": 2,
+		"bib": 3,
+		"time": "11:35"
+	},
+	{
+		"name": "Bob",
+		"rank": 1,
+		"bib": 4,
+		"time": "11:25"
+	}
+]
