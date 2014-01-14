@@ -4,6 +4,8 @@
     <script src="http://fb.me/react-0.8.0.js"></script>
     <script src="http://fb.me/JSXTransformer-0.8.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
     <!-- <script type="text/jsx" src="src/tutorial1.js"></script> -->
   </head>
   <body>
@@ -12,14 +14,42 @@
       /**
        * @jsx React.DOM
        */
+      var collection = new Backbone.Collection([
+        {
+          "name": "Phil",
+          "rank": 1,
+          "bib": 1,
+          "time": "12:43"
+        },
+        {
+          "name": "George",
+          "rank": 3,
+          "bib": 2,
+          "time": "12:12"
+        },
+        {
+          "name": "Jim",
+          "rank": 2,
+          "bib": 3,
+          "time": "11:35"
+        },
+        {
+          "name": "Bob",
+          "rank": 1,
+          "bib": 4,
+          "time": "11:25"
+        }
+      ]);
+
       var Result = React.createClass({
         render: function() {
+          console.log('Rendering result component.')
           return (
             <tr>
-              <td>{this.props.data.rank}</td>
-              <td>{this.props.data.bibNumber}</td>
-              <td>{this.props.data.name}</td>
-              <td>{this.props.data.time}</td>
+              <td>{this.props.data.attributes.rank}</td>
+              <td>{this.props.data.attributes.bib}</td>
+              <td>{this.props.data.attributes.name}</td>
+              <td>{this.props.data.attributes.time}</td>
             </tr>
           );
         }
@@ -27,9 +57,11 @@
 
       var ResultList = React.createClass({
         render: function() {
+          console.log('Rendering ResultsList component.', this.props.data);
           var resultNodes = this.props.data.map(function(result) {
             return <Result data={result} />;
           });
+          console.log('Result Nodes.', resultNodes);
           return (
             <tbody>
               {resultNodes}
@@ -38,45 +70,70 @@
         }
       });
 
+      var Search = React.createClass({
+        render: function() {
+          return (
+            <input onChange={this.props.handleChange}/>
+          );
+        }
+      });
+
       var TeamResults = React.createClass({
         getInitialState: function () {
+          console.log('returning initial state');
           return {
             data: []
           };
         },
 
         componentWillMount: function () {
-          $.ajax({
-            url: 'json/results.json',
-            dataType: 'json',
-            success: function(data) {
+          console.log('Component is mounting');
+          collection.url = 'json/results.json';
+          collection.fetch({
+            success:function() {
+              console.log('Collection fetched.');
               this.setState({
-                data: data
+                data: collection
               });
-            }.bind(this),
-            error: function(xhr, status, err) {
-              console.log('Error loading results.json', arguments);
             }.bind(this)
+          });
+        },
+
+        handleChange:function(event) {
+          var value = event.target.value;
+          console.log('Value: ' + value);
+
+          value = value.toLowerCase();
+          var filteredCollection = collection.filter(function(result) {
+            return (result.attributes.name.toLowerCase().indexOf(value) !== -1);
+          });
+
+          this.setState({
+            data: filteredCollection
           });
         },
 
         render: function() {
           return (
-            <table className="results">
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Bib #</th>
-                  <th>Name</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <ResultList data={this.state.data} />
-            </table>
+            <div>
+              <Search handleChange={this.handleChange.bind(this)}/>
+              <table className="results">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Bib #</th>
+                    <th>Name</th>
+                    <th>Time</th>
+                  </tr>
+                </thead>
+                <ResultList data={this.state.data} />
+              </table>
             
+            </div>
           );
         }
       });
+
 
       React.renderComponent(
         <TeamResults />,
